@@ -41,18 +41,34 @@ export default function ContentTypesPage() {
   }, [siteId]);
 
   return (
-    <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Content Types</h1>
-      <input placeholder="siteId" value={siteId} onChange={(e) => setSiteId(e.target.value)} />
-      <br />
-      <input placeholder="name" value={name} onChange={(e) => setName(e.target.value)} />
-      <br />
-      <input placeholder="slug" value={slug} onChange={(e) => setSlug(e.target.value)} />
-      <br />
-      <button onClick={create}>Create</button>
-      <button onClick={load}>Load</button>
-      <p>{error}</p>
-      <pre>{JSON.stringify(types, null, 2)}</pre>
-    </main>
+    <>
+      <div className="tp-topbar">
+        <div>
+          <h1 className="tp-title">Content types</h1>
+          <p style={{ color: 'var(--tp-color-text-muted)', marginTop: 4 }}>Define structured content schemas for a site.</p>
+        </div>
+      </div>
+
+      <div className="tp-grid tp-grid-2">
+        <div className="tp-card">
+          <h2 className="tp-card-title">Create content type</h2>
+          <div className="tp-form-grid">
+            <input className="tp-input" placeholder="Site ID" value={siteId} onChange={(e) => setSiteId(e.target.value)} />
+            <input className="tp-input" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+            <input className="tp-input" placeholder="Slug" value={slug} onChange={(e) => setSlug(e.target.value)} />
+            <div className="tp-row">
+              <button className="tp-button" onClick={create}>Create</button>
+              <button className="tp-button tp-button-secondary" onClick={load}>Reload</button>
+            </div>
+            {error ? <p style={{ color: 'var(--tp-color-danger)' }}>{error}</p> : null}
+          </div>
+        </div>
+
+        <div className="tp-card">
+          <h2 className="tp-card-title">Registered types</h2>
+          <pre className="tp-pre">{JSON.stringify(types, null, 2)}</pre>
+        </div>
+      </div>
+    </>
   );
 }

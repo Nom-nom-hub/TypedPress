@@ -1,4 +1,6 @@
 import http from 'node:http';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 import { loadPlatformConfig } from '@typedpress/config';
 import {
@@ -14,6 +16,31 @@ import {
   users,
   workspaces,
 } from '@typedpress/database';
+
+function loadEnvironmentFile(): void {
+  const candidatePaths = [path.resolve(process.cwd(), '../../.env'), path.resolve(process.cwd(), '.env')];
+  for (const filePath of candidatePaths) {
+    try {
+      const contents = readFileSync(filePath, 'utf8');
+      for (const line of contents.split(/\r?\n/)) {
+        const trimmed = line.trim();
+        if (trimmed === '' || trimmed.startsWith('#')) continue;
+        const separatorIndex = trimmed.indexOf('=');
+        if (separatorIndex === -1) continue;
+        const key = trimmed.slice(0, separatorIndex).trim();
+        const value = trimmed.slice(separatorIndex + 1).trim();
+        if (key !== '' && process.env[key] === undefined) {
+          process.env[key] = value;
+        }
+      }
+    } catch {
+      // Ignore missing files; the process environment may already be configured.
+    }
+  }
+}
+
+loadEnvironmentFile();
+
 import { hasPermission, platformPermissions } from '@typedpress/permissions';
 import {
   hashPassword,
@@ -106,8 +133,23 @@ function publicUser(user: { id: string; email: string; displayName: string; stat
 
 const server = http.createServer(async (request, response) => {
   try {
-    const url = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`);
+    const origin = request.headers.origin;
+    if (origin) {
+      response.setHeader('Access-Control-Allow-Origin', origin);
+      response.setHeader('Vary', 'Origin');
+    }
+    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    response.setHeader('Access-Control-Allow-Credentials', 'true');
+
     const method = request.method ?? 'GET';
+    const url = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`);
+
+    if (method === 'OPTIONS') {
+      response.writeHead(204);
+      response.end();
+      return;
+    }
 
     if (url.pathname === '/health' && method === 'GET') {
       sendJson(response, 200, { status: 'ok' });

@@ -25,14 +25,15 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Login</h1>
-      <input placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <br />
-      <input placeholder="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      <br />
-      <button onClick={submit}>Login</button>
-      <p>{message}</p>
-    </main>
+    <div className="tp-card" style={{ maxWidth: 420, margin: '8vh auto' }}>
+      <h1 className="tp-title" style={{ fontSize: '1.4rem', marginBottom: 8 }}>Sign in</h1>
+      <p style={{ color: 'var(--tp-color-text-muted)', marginTop: 0 }}>Access the TypedPress administration.</p>
+      <div className="tp-form-grid">
+        <input className="tp-input" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input className="tp-input" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <button className="tp-button" onClick={submit}>Sign in</button>
+        {message ? <p style={{ color: message === 'Logged in' ? 'var(--tp-color-success)' : 'var(--tp-color-danger)' }}>{message}</p> : null}
+      </div>
+    </div>
   );
 }

@@ -50,22 +50,36 @@ export default function ContentEntriesPage() {
   }, [siteId]);
 
   return (
-    <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Content Entries</h1>
-      <input placeholder="siteId" value={siteId} onChange={(e) => setSiteId(e.target.value)} />
-      <button onClick={load}>Load</button>
-      <br />
-      <input placeholder="contentTypeId" value={contentTypeId} onChange={(e) => setContentTypeId(e.target.value)} />
-      <br />
-      <input placeholder="slug" value={slug} onChange={(e) => setSlug(e.target.value)} />
-      <br />
-      <input placeholder="title" value={title} onChange={(e) => setTitle(e.target.value)} />
-      <br />
-      <textarea value={data} onChange={(e) => setData(e.target.value)} rows={6} cols={60} />
-      <br />
-      <button onClick={create}>Create Entry</button>
-      <p>{error}</p>
-      <pre>{JSON.stringify(entries, null, 2)}</pre>
-    </main>
+    <>
+      <div className="tp-topbar">
+        <div>
+          <h1 className="tp-title">Content entries</h1>
+          <p style={{ color: 'var(--tp-color-text-muted)', marginTop: 4 }}>Create and inspect immutable content revisions.</p>
+        </div>
+      </div>
+
+      <div className="tp-grid tp-grid-2">
+        <div className="tp-card">
+          <h2 className="tp-card-title">Create entry</h2>
+          <div className="tp-form-grid">
+            <input className="tp-input" placeholder="Site ID" value={siteId} onChange={(e) => setSiteId(e.target.value)} />
+            <input className="tp-input" placeholder="Content type ID" value={contentTypeId} onChange={(e) => setContentTypeId(e.target.value)} />
+            <input className="tp-input" placeholder="Slug" value={slug} onChange={(e) => setSlug(e.target.value)} />
+            <input className="tp-input" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+            <textarea className="tp-textarea" value={data} onChange={(e) => setData(e.target.value)} />
+            <div className="tp-row">
+              <button className="tp-button" onClick={create}>Create entry</button>
+              <button className="tp-button tp-button-secondary" onClick={load}>Reload</button>
+            </div>
+            {error ? <p style={{ color: 'var(--tp-color-danger)' }}>{error}</p> : null}
+          </div>
+        </div>
+
+        <div className="tp-card">
+          <h2 className="tp-card-title">Entries</h2>
+          <pre className="tp-pre">{JSON.stringify(entries, null, 2)}</pre>
+        </div>
+      </div>
+    </>
   );
 }
