@@ -1,7 +1,17 @@
 import http from 'node:http';
 
 import { loadPlatformConfig } from '@typedpress/config';
-import { createDatabaseClientFromConfig, sites, users, workspaces } from '@typedpress/database';
+import {
+  createDatabaseClientFromConfig,
+  permissions,
+  platformUserRoles,
+  rolePermissions,
+  roles,
+  sites,
+  users,
+  workspaces,
+} from '@typedpress/database';
+import { hasPermission, platformPermissions } from '@typedpress/permissions';
 import { hashPassword, verifyPassword, createSession, resolveSession } from '@typedpress/auth';
 import { createLogger } from '@typedpress/logger';
 import { eq } from 'drizzle-orm';
@@ -32,6 +42,16 @@ async function requireSession(request: http.IncomingMessage) {
     return null;
   }
   return resolveSession(database.db, authorization.slice('Bearer '.length));
+}
+
+async function getGrantedPermissions(userId: string): Promise<string[]> {
+  const rows = await database.db
+    .select({ key: permissions.key })
+    .from(platformUserRoles)
+    .innerJoin(rolePermissions, eq(rolePermissions.roleId, platformUserRoles.roleId))
+    .innerJoin(permissions, eq(permissions.id, rolePermissions.permissionId))
+    .where(eq(platformUserRoles.userId, userId));
+  return rows.map((row) => row.key);
 }
 
 const server = http.createServer(async (request, response) => {
@@ -67,6 +87,45 @@ const server = http.createServer(async (request, response) => {
         sendJson(response, 500, { error: 'Failed to create user' });
         return;
       }
+
+      const permissionRows = await Promise.all(
+        platformPermissions.map(async (key) => {
+          const [existing] = await database.db
+            .select()
+            .from(permissions)
+            .where(eq(permissions.key, key))
+            .limit(1);
+          if (existing) return existing;
+          const [created] = await database.db
+            .insert(permissions)
+            .values({ key, description: key })
+            .returning();
+          return created;
+        }),
+      );
+
+      const [adminRole] = await database.db
+        .insert(roles)
+        .values({ name: 'platform-admin', isSystem: 'true', description: 'Platform administrator' })
+        .returning();
+      if (!adminRole) {
+        sendJson(response, 500, { error: 'Failed to create admin role' });
+        return;
+      }
+
+      await database.db.insert(rolePermissions).values(
+        permissionRows
+          .filter((permission): permission is NonNullable<typeof permission> => Boolean(permission))
+          .map((permission) => ({
+            roleId: adminRole.id,
+            permissionId: permission.id,
+          })),
+      );
+      await database.db.insert(platformUserRoles).values({
+        userId: user.id,
+        roleId: adminRole.id,
+      });
+
       const session = await createSession(database.db, user.id);
       sendJson(response, 201, { user, token: session.token });
       return;
@@ -91,19 +150,30 @@ const server = http.createServer(async (request, response) => {
       sendJson(response, 401, { error: 'Authentication required' });
       return;
     }
+    const grantedPermissions = await getGrantedPermissions(authenticated.user.id);
 
     if (url.pathname === '/users' && method === 'GET') {
-      const rows = await database.db.select({
-        id: users.id,
-        email: users.email,
-        displayName: users.displayName,
-        status: users.status,
-      }).from(users);
+      if (!hasPermission(grantedPermissions, 'platform.users.read')) {
+        sendJson(response, 403, { error: 'Forbidden' });
+        return;
+      }
+      const rows = await database.db
+        .select({
+          id: users.id,
+          email: users.email,
+          displayName: users.displayName,
+          status: users.status,
+        })
+        .from(users);
       sendJson(response, 200, { users: rows });
       return;
     }
 
     if (url.pathname === '/users' && method === 'POST') {
+      if (!hasPermission(grantedPermissions, 'platform.users.create')) {
+        sendJson(response, 403, { error: 'Forbidden' });
+        return;
+      }
       const body = await readJson(request);
       const email = String(body.email ?? '');
       const password = String(body.password ?? '');
@@ -113,7 +183,10 @@ const server = http.createServer(async (request, response) => {
         return;
       }
       const passwordHash = await hashPassword(password);
-      const [user] = await database.db.insert(users).values({ email, passwordHash, displayName }).returning();
+      const [user] = await database.db
+        .insert(users)
+        .values({ email, passwordHash, displayName })
+        .returning();
       if (!user) {
         sendJson(response, 500, { error: 'Failed to create user' });
         return;
@@ -122,12 +195,20 @@ const server = http.createServer(async (request, response) => {
       return;
     }
     if (url.pathname === '/workspaces' && method === 'GET') {
+      if (!hasPermission(grantedPermissions, 'platform.workspaces.read')) {
+        sendJson(response, 403, { error: 'Forbidden' });
+        return;
+      }
       const rows = await database.db.select().from(workspaces);
       sendJson(response, 200, { workspaces: rows });
       return;
     }
 
     if (url.pathname === '/workspaces' && method === 'POST') {
+      if (!hasPermission(grantedPermissions, 'platform.workspaces.create')) {
+        sendJson(response, 403, { error: 'Forbidden' });
+        return;
+      }
       const body = await readJson(request);
       const name = String(body.name ?? '');
       const slug = String(body.slug ?? '');
@@ -141,12 +222,20 @@ const server = http.createServer(async (request, response) => {
     }
 
     if (url.pathname === '/sites' && method === 'GET') {
+      if (!hasPermission(grantedPermissions, 'platform.sites.read')) {
+        sendJson(response, 403, { error: 'Forbidden' });
+        return;
+      }
       const rows = await database.db.select().from(sites);
       sendJson(response, 200, { sites: rows });
       return;
     }
 
     if (url.pathname === '/sites' && method === 'POST') {
+      if (!hasPermission(grantedPermissions, 'platform.sites.create')) {
+        sendJson(response, 403, { error: 'Forbidden' });
+        return;
+      }
       const body = await readJson(request);
       const workspaceId = String(body.workspaceId ?? '');
       const name = String(body.name ?? '');
@@ -155,14 +244,19 @@ const server = http.createServer(async (request, response) => {
         sendJson(response, 400, { error: 'workspaceId, name, and slug are required' });
         return;
       }
-      const [site] = await database.db.insert(sites).values({ workspaceId, name, slug }).returning();
+      const [site] = await database.db
+        .insert(sites)
+        .values({ workspaceId, name, slug })
+        .returning();
       sendJson(response, 201, { site });
       return;
     }
 
     sendJson(response, 404, { error: 'Not found' });
   } catch (error) {
-    logger.error('Request failed', { error: error instanceof Error ? error.message : String(error) });
+    logger.error('Request failed', {
+      error: error instanceof Error ? error.message : String(error),
+    });
     sendJson(response, 500, { error: 'Internal server error' });
   }
 });

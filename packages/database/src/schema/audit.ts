@@ -15,5 +15,8 @@ export const auditLogs = pgTable(
     requestId: varchar('request_id', { length: 255 }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index('audit_logs_site_id_idx').on(table.siteId), index('audit_logs_actor_user_id_idx').on(table.actorUserId)],
+  (table) => [
+    index('audit_logs_site_id_idx').on(table.siteId),
+    index('audit_logs_actor_user_id_idx').on(table.actorUserId),
+  ],
 );

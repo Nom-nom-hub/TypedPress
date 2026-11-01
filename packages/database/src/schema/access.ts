@@ -1,4 +1,13 @@
-import { foreignKey, index, pgTable, primaryKey, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  foreignKey,
+  index,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 
 import { sites, users, workspaces } from './identity.js';
 
@@ -18,7 +27,10 @@ export const roles = pgTable(
     isSystem: varchar('is_system', { length: 10 }).notNull().default('false'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index('roles_site_id_idx').on(table.siteId), index('roles_site_id_id_idx').on(table.siteId, table.id)],
+  (table) => [
+    index('roles_site_id_idx').on(table.siteId),
+    index('roles_site_id_id_idx').on(table.siteId, table.id),
+  ],
 );
 
 export const rolePermissions = pgTable(
