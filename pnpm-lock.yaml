@@ -74,6 +74,9 @@ importers:
       '@typedpress/validation':
         specifier: workspace:*
         version: link:../../packages/validation
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.44.7(@types/pg@8.23.1)(pg@8.23.1)
 
   packages/auth:
     dependencies:

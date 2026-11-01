@@ -20,6 +20,7 @@
     "@typedpress/logger": "workspace:*",
     "@typedpress/permissions": "workspace:*",
     "@typedpress/types": "workspace:*",
-    "@typedpress/validation": "workspace:*"
+    "@typedpress/validation": "workspace:*",
+    "drizzle-orm": "catalog:"
   }
 }
