@@ -23,6 +23,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <a href="/">Overview</a>
               <a href="/content-types">Content types</a>
               <a href="/content-entries">Content entries</a>
+              <a href="/editor">Visual editor</a>
               <a href="/login">Login</a>
             </nav>
             <div style={{ marginTop: 'auto', color: 'var(--tp-color-text-muted)', fontSize: '0.8rem' }}>
