@@ -16,8 +16,7 @@ import {
   hashPassword,
   verifyPassword,
   resolveSession,
-  generateSessionToken,
-  hashSessionToken,
+  createSession,
   revokeSession,
 } from '@typedpress/auth';
 import { emailAddressSchema } from '@typedpress/validation';
