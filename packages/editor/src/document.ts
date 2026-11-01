@@ -73,7 +73,10 @@ export function insertEditorNode(
     throw new Error(`Parent node does not exist: ${parentId}`);
   }
   next.nodes[node.id] = node;
-  const position = index === undefined ? parent.children.length : Math.max(0, Math.min(index, parent.children.length));
+  const position =
+    index === undefined
+      ? parent.children.length
+      : Math.max(0, Math.min(index, parent.children.length));
   parent.children.splice(position, 0, node.id);
   return validateNodeReferences(next);
 }
