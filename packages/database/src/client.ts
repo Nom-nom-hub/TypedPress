@@ -3,7 +3,9 @@ import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import type { PlatformConfig } from '@typedpress/config';
 
-export type Database = NodePgDatabase<Record<string, never>>;
+import { platformSchema } from './schema/index.js';
+
+export type Database = NodePgDatabase<typeof platformSchema>;
 
 export interface DatabaseClient {
   readonly db: Database;
@@ -26,7 +28,7 @@ export function createDatabaseClient(options: CreateDatabaseClientOptions): Data
   }
 
   const pool = new Pool(poolConfig);
-  const db = drizzle(pool);
+  const db = drizzle(pool, { schema: platformSchema });
 
   return {
     db,
