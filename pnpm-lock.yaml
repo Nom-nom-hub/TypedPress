@@ -47,6 +47,54 @@ importers:
         specifier: ^3.2.0
         version: 3.2.7(@types/node@26.6.6)(tsx@4.23.15)(yaml@2.9.1)
 
+  apps/api:
+    dependencies:
+      '@typedpress/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
+      '@typedpress/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@typedpress/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@typedpress/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@typedpress/logger':
+        specifier: workspace:*
+        version: link:../../packages/logger
+      '@typedpress/permissions':
+        specifier: workspace:*
+        version: link:../../packages/permissions
+      '@typedpress/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@typedpress/validation':
+        specifier: workspace:*
+        version: link:../../packages/validation
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.44.7(@types/pg@8.23.1)(pg@8.23.1)
+
+  packages/auth:
+    dependencies:
+      '@typedpress/core':
+        specifier: workspace:*
+        version: link:../core
+      '@typedpress/database':
+        specifier: workspace:*
+        version: link:../database
+      '@typedpress/logger':
+        specifier: workspace:*
+        version: link:../logger
+      '@typedpress/types':
+        specifier: workspace:*
+        version: link:../types
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.44.7(@types/pg@8.23.1)(pg@8.23.1)
+
   packages/config:
     dependencies:
       '@typedpress/types':
@@ -91,6 +139,12 @@ importers:
         version: 0.31.11
 
   packages/logger: {}
+
+  packages/permissions:
+    dependencies:
+      '@typedpress/types':
+        specifier: workspace:*
+        version: link:../types
 
   packages/types: {}
 

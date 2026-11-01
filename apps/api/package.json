@@ -1,0 +1,26 @@
+{
+  "name": "@typedpress/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/server.js",
+  "scripts": {
+    "dev": "tsc -p tsconfig.json && node --watch dist/server.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src --max-warnings 0",
+    "start": "node dist/server.js",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "@typedpress/auth": "workspace:*",
+    "@typedpress/config": "workspace:*",
+    "@typedpress/core": "workspace:*",
+    "@typedpress/database": "workspace:*",
+    "@typedpress/logger": "workspace:*",
+    "@typedpress/permissions": "workspace:*",
+    "@typedpress/types": "workspace:*",
+    "@typedpress/validation": "workspace:*",
+    "drizzle-orm": "catalog:"
+  }
+}
