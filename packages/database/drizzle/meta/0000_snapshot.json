@@ -1,5 +1,5 @@
 {
-  "id": "e8c45715-cfaa-486c-8346-afd42ca2fbe1",
+  "id": "ace9c6a7-d75e-4498-9735-bbf25b761268",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -134,7 +134,7 @@
         },
         "settings": {
           "name": "settings",
-          "type": "text",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
@@ -533,10 +533,10 @@
         },
         "is_system": {
           "name": "is_system",
-          "type": "varchar(10)",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "default": "'false'"
+          "default": false
         },
         "created_at": {
           "name": "created_at",
@@ -562,8 +562,8 @@
           "method": "btree",
           "with": {}
         },
-        "roles_site_id_id_idx": {
-          "name": "roles_site_id_id_idx",
+        "roles_site_id_id_uidx": {
+          "name": "roles_site_id_id_uidx",
           "columns": [
             {
               "expression": "site_id",
@@ -578,7 +578,7 @@
               "nulls": "last"
             }
           ],
-          "isUnique": false,
+          "isUnique": true,
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -830,10 +830,10 @@
         },
         "metadata": {
           "name": "metadata",
-          "type": "text",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": true,
-          "default": "'{}'"
+          "default": "'{}'::jsonb"
         },
         "request_id": {
           "name": "request_id",

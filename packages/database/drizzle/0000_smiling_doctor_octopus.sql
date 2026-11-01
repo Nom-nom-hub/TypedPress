@@ -13,7 +13,7 @@ CREATE TABLE "sites" (
 	"name" varchar(255) NOT NULL,
 	"slug" varchar(255) NOT NULL,
 	"status" varchar(50) DEFAULT 'active' NOT NULL,
-	"settings" text,
+	"settings" jsonb,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "sites_slug_unique" UNIQUE("slug")
@@ -65,7 +65,7 @@ CREATE TABLE "roles" (
 	"site_id" uuid,
 	"name" varchar(255) NOT NULL,
 	"description" text,
-	"is_system" varchar(10) DEFAULT 'false' NOT NULL,
+	"is_system" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
@@ -92,7 +92,7 @@ CREATE TABLE "audit_logs" (
 	"action" varchar(255) NOT NULL,
 	"resource_type" varchar(255) NOT NULL,
 	"resource_id" uuid,
-	"metadata" text DEFAULT '{}' NOT NULL,
+	"metadata" jsonb DEFAULT '{}'::jsonb NOT NULL,
 	"request_id" varchar(255),
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -120,7 +120,7 @@ CREATE INDEX "sites_workspace_id_idx" ON "sites" USING btree ("workspace_id");--
 CREATE INDEX "users_status_idx" ON "users" USING btree ("status");--> statement-breakpoint
 CREATE INDEX "platform_user_roles_user_id_idx" ON "platform_user_roles" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "roles_site_id_idx" ON "roles" USING btree ("site_id");--> statement-breakpoint
-CREATE INDEX "roles_site_id_id_idx" ON "roles" USING btree ("site_id","id");--> statement-breakpoint
+CREATE UNIQUE INDEX "roles_site_id_id_uidx" ON "roles" USING btree ("site_id","id");--> statement-breakpoint
 CREATE INDEX "user_site_roles_user_id_idx" ON "user_site_roles" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "user_site_roles_site_id_idx" ON "user_site_roles" USING btree ("site_id");--> statement-breakpoint
 CREATE INDEX "audit_logs_site_id_idx" ON "audit_logs" USING btree ("site_id");--> statement-breakpoint

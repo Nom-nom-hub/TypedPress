@@ -1,10 +1,12 @@
 import {
+  boolean,
   foreignKey,
   index,
   pgTable,
   primaryKey,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
@@ -24,12 +26,12 @@ export const roles = pgTable(
     siteId: uuid('site_id').references(() => sites.id, { onDelete: 'cascade' }),
     name: varchar('name', { length: 255 }).notNull(),
     description: text('description'),
-    isSystem: varchar('is_system', { length: 10 }).notNull().default('false'),
+    isSystem: boolean('is_system').notNull().default(false),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
     index('roles_site_id_idx').on(table.siteId),
-    index('roles_site_id_id_idx').on(table.siteId, table.id),
+    uniqueIndex('roles_site_id_id_uidx').on(table.siteId, table.id),
   ],
 );
 

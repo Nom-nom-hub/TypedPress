@@ -1,4 +1,4 @@
-import { index, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import { index, jsonb, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
 export const users = pgTable(
   'users',
@@ -32,7 +32,7 @@ export const sites = pgTable(
     name: varchar('name', { length: 255 }).notNull(),
     slug: varchar('slug', { length: 255 }).notNull().unique(),
     status: varchar('status', { length: 50 }).notNull().default('active'),
-    settings: text('settings'),
+    settings: jsonb('settings'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

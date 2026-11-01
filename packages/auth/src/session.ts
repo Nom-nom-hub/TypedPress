@@ -44,12 +44,18 @@ export async function resolveSession(database: DatabaseClient['db'], token: stri
     .where(eq(sessions.tokenHash, tokenHash))
     .limit(1);
 
-  if (!session || session.expiresAt <= new Date()) {
+  if (!session) {
+    return null;
+  }
+
+  const now = new Date();
+  if (session.expiresAt <= now) {
+    await database.delete(sessions).where(eq(sessions.tokenHash, tokenHash));
     return null;
   }
 
   const [user] = await database.select().from(users).where(eq(users.id, session.userId)).limit(1);
-  if (!user) {
+  if (!user || user.status !== 'active') {
     return null;
   }
 
