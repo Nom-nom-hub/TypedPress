@@ -2,6 +2,9 @@ import http from 'node:http';
 
 import { loadPlatformConfig } from '@typedpress/config';
 import {
+  contentEntries,
+  contentRevisions,
+  contentTypes,
   createDatabaseClientFromConfig,
   permissions,
   platformUserRoles,
@@ -355,6 +358,157 @@ const server = http.createServer(async (request, response) => {
       }
       await revokeSession(database.db, authorization.slice('Bearer '.length));
       sendJson(response, 204, {});
+      return;
+    }
+
+    if (url.pathname === '/content-types' && method === 'GET') {
+      if (!hasPermission(grantedPermissions, 'content.types.read')) {
+        sendJson(response, 403, { error: 'Forbidden' });
+        return;
+      }
+      const siteId = url.searchParams.get('siteId');
+      const rows = siteId
+        ? await database.db.select().from(contentTypes).where(eq(contentTypes.siteId, siteId))
+        : await database.db.select().from(contentTypes);
+      sendJson(response, 200, { contentTypes: rows });
+      return;
+    }
+
+    if (url.pathname === '/content-types' && method === 'POST') {
+      if (!hasPermission(grantedPermissions, 'content.types.create')) {
+        sendJson(response, 403, { error: 'Forbidden' });
+        return;
+      }
+      const body = await readJson(request);
+      const siteId = String(body.siteId ?? '');
+      const name = String(body.name ?? '');
+      const slug = String(body.slug ?? '');
+      if (!siteId || !name || !slug) {
+        sendJson(response, 400, { error: 'siteId, name, and slug are required' });
+        return;
+      }
+      const [contentType] = await database.db
+        .insert(contentTypes)
+        .values({
+          siteId,
+          name,
+          slug,
+          description: body.description ? String(body.description) : null,
+          fieldSchema:
+            body.fieldSchema && typeof body.fieldSchema === 'object' ? body.fieldSchema : {},
+          settings: body.settings && typeof body.settings === 'object' ? body.settings : null,
+        })
+        .returning();
+      sendJson(response, 201, { contentType });
+      return;
+    }
+
+    const contentEntryMatch = url.pathname.match(/^\/content-entries\/([^/]+)$/);
+    if (contentEntryMatch && method === 'GET') {
+      if (!hasPermission(grantedPermissions, 'content.entries.read')) {
+        sendJson(response, 403, { error: 'Forbidden' });
+        return;
+      }
+      const id = contentEntryMatch[1]!;
+      const [entry] = await database.db
+        .select()
+        .from(contentEntries)
+        .where(eq(contentEntries.id, id))
+        .limit(1);
+      if (!entry) {
+        sendJson(response, 404, { error: 'Content entry not found' });
+        return;
+      }
+      sendJson(response, 200, { entry });
+      return;
+    }
+
+    if (url.pathname === '/content-entries' && method === 'GET') {
+      if (!hasPermission(grantedPermissions, 'content.entries.read')) {
+        sendJson(response, 403, { error: 'Forbidden' });
+        return;
+      }
+      const siteId = url.searchParams.get('siteId');
+      const status = url.searchParams.get('status');
+      const rows = siteId
+        ? await database.db.select().from(contentEntries).where(eq(contentEntries.siteId, siteId))
+        : await database.db.select().from(contentEntries);
+      sendJson(response, 200, {
+        contentEntries: status ? rows.filter((row) => row.status === status) : rows,
+      });
+      return;
+    }
+
+    if (url.pathname === '/content-entries' && method === 'POST') {
+      if (!hasPermission(grantedPermissions, 'content.entries.create')) {
+        sendJson(response, 403, { error: 'Forbidden' });
+        return;
+      }
+      const body = await readJson(request);
+      const siteId = String(body.siteId ?? '');
+      const contentTypeId = String(body.contentTypeId ?? '');
+      const slug = String(body.slug ?? '');
+      const title = body.title ? String(body.title) : null;
+      const data = body.data && typeof body.data === 'object' ? body.data : {};
+      const authorId = String(body.authorId ?? authenticated.user.id);
+      if (!siteId || !contentTypeId || !slug) {
+        sendJson(response, 400, { error: 'siteId, contentTypeId, and slug are required' });
+        return;
+      }
+      const [entry] = await database.db
+        .insert(contentEntries)
+        .values({
+          siteId,
+          contentTypeId,
+          authorId,
+          slug,
+          title,
+          status: 'draft',
+          currentRevisionId: null,
+        })
+        .returning();
+      if (!entry) {
+        sendJson(response, 500, { error: 'Failed to create content entry' });
+        return;
+      }
+      const [revision] = await database.db
+        .insert(contentRevisions)
+        .values({
+          siteId,
+          contentEntryId: entry.id,
+          revisionNumber: 1,
+          data,
+          createdByUserId: authorId,
+        })
+        .returning();
+      if (revision) {
+        await database.db
+          .update(contentEntries)
+          .set({ currentRevisionId: revision.id })
+          .where(eq(contentEntries.id, entry.id));
+      }
+      sendJson(response, 201, { entry: { ...entry, currentRevisionId: revision?.id ?? null } });
+      return;
+    }
+
+    const publishMatch = url.pathname.match(/^\/content-entries\/([^/]+)\/publish$/);
+    if (publishMatch && method === 'POST') {
+      if (!hasPermission(grantedPermissions, 'content.entries.publish')) {
+        sendJson(response, 403, { error: 'Forbidden' });
+        return;
+      }
+      const id = publishMatch[1]!;
+      const body = await readJson(request);
+      const revisionId = String(body.revisionId ?? '');
+      if (!revisionId) {
+        sendJson(response, 400, { error: 'revisionId is required' });
+        return;
+      }
+      await database.db
+        .update(contentEntries)
+        .set({ status: 'published', publishedRevisionId: revisionId, publishedAt: new Date() })
+        .where(eq(contentEntries.id, id));
+      sendJson(response, 200, { status: 'published', entryId: id, revisionId });
       return;
     }
 

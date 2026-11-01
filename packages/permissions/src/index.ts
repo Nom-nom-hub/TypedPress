@@ -8,6 +8,15 @@ export const platformPermissions = [
   'platform.roles.read',
   'platform.roles.write',
   'platform.audit.read',
+  'content.types.read',
+  'content.types.create',
+  'content.entries.read',
+  'content.entries.create',
+  'content.entries.publish',
+  'content.taxonomies.read',
+  'content.taxonomies.create',
+  'content.media.read',
+  'content.media.upload',
 ] as const;
 
 export type PlatformPermission = (typeof platformPermissions)[number];
