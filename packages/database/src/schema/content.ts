@@ -1,5 +1,4 @@
 import {
-  foreignKey,
   index,
   integer,
   jsonb,
@@ -64,10 +63,5 @@ export const contentEntries = pgTable(
     index('content_entries_site_status_idx').on(table.siteId, table.status),
     uniqueIndex('content_entries_site_id_id_uidx').on(table.siteId, table.id),
     uniqueIndex('content_entries_site_id_slug_uidx').on(table.siteId, table.slug),
-    foreignKey({
-      columns: [table.siteId, table.contentTypeId],
-      foreignColumns: [contentTypes.siteId, contentTypes.id],
-      name: 'content_entries_site_type_fk',
-    }),
   ],
 );

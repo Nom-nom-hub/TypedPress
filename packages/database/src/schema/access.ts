@@ -1,6 +1,5 @@
 import {
   boolean,
-  foreignKey,
   index,
   pgTable,
   primaryKey,
@@ -82,11 +81,6 @@ export const userSiteRoles = pgTable(
   (table) => [
     index('user_site_roles_user_id_idx').on(table.userId),
     index('user_site_roles_site_id_idx').on(table.siteId),
-    foreignKey({
-      columns: [table.siteId, table.roleId],
-      foreignColumns: [roles.siteId, roles.id],
-      name: 'user_site_roles_site_role_fk',
-    }),
   ],
 );
 
