@@ -1,0 +1,13 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'tooling/*'
+
+allowBuilds:
+  esbuild: true
+
+catalog:
+  # Shared dependency versions for workspace packages.
+  zod: ^3.25.0
+  drizzle-orm: ^0.44.0
+  drizzle-kit: ^0.31.0

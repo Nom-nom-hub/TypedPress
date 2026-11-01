@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+language: 'en-US'
+early_access: false
+
+reviews:
+  profile: 'assertive'
+  request_changes_workflow: true
+  high_level_summary: true
+  review_status: true
+  collapse_walkthrough: false
+  poem: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches: ['main', 'release/*']
+    auto_pause_after_reviewed_commits: 0
+
+  path_instructions:
+    - path: 'apps/admin/**'
+      instructions: |
+        Review React architecture, accessibility, interaction behavior,
+        state management, performance, responsive behavior, and design-system
+        compliance. Identify fake interactions and incomplete user workflows.
+
+    - path: 'apps/api/**'
+      instructions: |
+        Review authentication, authorization, input validation, API contracts,
+        error handling, rate limiting, and security boundaries.
+
+    - path: 'packages/database/**'
+      instructions: |
+        Carefully review migrations, data integrity, transaction safety,
+        indexes, tenant isolation, and destructive database operations.
+
+    - path: 'packages/editor/**'
+      instructions: |
+        Review document integrity, component registration, undo and redo,
+        responsive behavior, serialization, validation, and editor performance.
+
+    - path: 'packages/renderer/**'
+      instructions: |
+        Review component resolution, server-side rendering, validation,
+        untrusted input handling, rendering security, and performance.
+
+    - path: 'packages/plugins/**'
+      instructions: |
+        Apply strict security scrutiny. Review permissions, plugin isolation,
+        capability enforcement, lifecycle operations, migrations, and
+        potential privilege escalation.
+
+    - path: 'packages/plugin-sdk/**'
+      instructions: |
+        Review public API stability, TypeScript types, compatibility,
+        extension contracts, and developer experience.
+
+    - path: '.github/**'
+      instructions: |
+        Review workflow permissions, secret exposure, untrusted pull request
+        execution, action pinning, deployment protection, and CI reliability.
+
+chat:
+  auto_reply: true
