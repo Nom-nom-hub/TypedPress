@@ -1,12 +1,4 @@
-import {
-  foreignKey,
-  index,
-  pgTable,
-  timestamp,
-  uniqueIndex,
-  uuid,
-  varchar,
-} from 'drizzle-orm/pg-core';
+import { index, pgTable, timestamp, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
 
 import { sites } from './identity.js';
 import { contentEntries } from './content.js';
@@ -30,15 +22,5 @@ export const contentRelationships = pgTable(
   (table) => [
     index('content_relationships_site_id_idx').on(table.siteId),
     uniqueIndex('content_relationships_site_id_id_uidx').on(table.siteId, table.id),
-    foreignKey({
-      columns: [table.siteId, table.sourceEntryId],
-      foreignColumns: [contentEntries.siteId, contentEntries.id],
-      name: 'content_relationships_site_source_fk',
-    }),
-    foreignKey({
-      columns: [table.siteId, table.targetEntryId],
-      foreignColumns: [contentEntries.siteId, contentEntries.id],
-      name: 'content_relationships_site_target_fk',
-    }),
   ],
 );

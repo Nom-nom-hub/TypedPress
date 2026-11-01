@@ -1,5 +1,5 @@
 {
-  "id": "684c1280-6deb-4f5b-befa-13e04f1b1cd1",
+  "id": "36b46b95-212e-4743-945b-ae8613fdc08a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -697,15 +697,6 @@
           "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
-        },
-        "user_site_roles_site_role_fk": {
-          "name": "user_site_roles_site_role_fk",
-          "tableFrom": "user_site_roles",
-          "tableTo": "roles",
-          "columnsFrom": ["site_id", "role_id"],
-          "columnsTo": ["site_id", "id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -1116,15 +1107,6 @@
           "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
-        },
-        "content_entries_site_type_fk": {
-          "name": "content_entries_site_type_fk",
-          "tableFrom": "content_entries",
-          "tableTo": "content_types",
-          "columnsFrom": ["site_id", "content_type_id"],
-          "columnsTo": ["site_id", "id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -1501,24 +1483,6 @@
           "columnsFrom": ["taxonomy_term_id"],
           "columnsTo": ["id"],
           "onDelete": "restrict",
-          "onUpdate": "no action"
-        },
-        "content_entry_terms_site_entry_fk": {
-          "name": "content_entry_terms_site_entry_fk",
-          "tableFrom": "content_entry_terms",
-          "tableTo": "content_entries",
-          "columnsFrom": ["site_id", "content_entry_id"],
-          "columnsTo": ["site_id", "id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "content_entry_terms_site_term_fk": {
-          "name": "content_entry_terms_site_term_fk",
-          "tableFrom": "content_entry_terms",
-          "tableTo": "taxonomy_terms",
-          "columnsFrom": ["site_id", "taxonomy_term_id"],
-          "columnsTo": ["site_id", "id"],
-          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -2062,24 +2026,6 @@
           "columnsFrom": ["target_entry_id"],
           "columnsTo": ["id"],
           "onDelete": "restrict",
-          "onUpdate": "no action"
-        },
-        "content_relationships_site_source_fk": {
-          "name": "content_relationships_site_source_fk",
-          "tableFrom": "content_relationships",
-          "tableTo": "content_entries",
-          "columnsFrom": ["site_id", "source_entry_id"],
-          "columnsTo": ["site_id", "id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "content_relationships_site_target_fk": {
-          "name": "content_relationships_site_target_fk",
-          "tableFrom": "content_relationships",
-          "tableTo": "content_entries",
-          "columnsFrom": ["site_id", "target_entry_id"],
-          "columnsTo": ["site_id", "id"],
-          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
