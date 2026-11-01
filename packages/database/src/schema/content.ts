@@ -1,4 +1,15 @@
-import { index, integer, jsonb, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  foreignKey,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 
 import { sites, users } from './identity.js';
 
@@ -8,7 +19,7 @@ export const contentTypes = pgTable(
     id: uuid('id').defaultRandom().primaryKey(),
     siteId: uuid('site_id')
       .notNull()
-      .references(() => sites.id, { onDelete: 'cascade' }),
+      .references(() => sites.id, { onDelete: 'restrict' }),
     name: varchar('name', { length: 255 }).notNull(),
     slug: varchar('slug', { length: 255 }).notNull(),
     description: text('description'),
@@ -18,7 +29,11 @@ export const contentTypes = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index('content_types_site_id_idx').on(table.siteId)],
+  (table) => [
+    index('content_types_site_id_idx').on(table.siteId),
+    uniqueIndex('content_types_site_id_id_uidx').on(table.siteId, table.id),
+    uniqueIndex('content_types_site_id_slug_uidx').on(table.siteId, table.slug),
+  ],
 );
 
 export const contentEntries = pgTable(
@@ -27,7 +42,7 @@ export const contentEntries = pgTable(
     id: uuid('id').defaultRandom().primaryKey(),
     siteId: uuid('site_id')
       .notNull()
-      .references(() => sites.id, { onDelete: 'cascade' }),
+      .references(() => sites.id, { onDelete: 'restrict' }),
     contentTypeId: uuid('content_type_id')
       .notNull()
       .references(() => contentTypes.id, { onDelete: 'restrict' }),
@@ -43,110 +58,16 @@ export const contentEntries = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index('content_entries_site_id_idx').on(table.siteId), index('content_entries_status_idx').on(table.status)],
-);
-
-export const contentRevisions = pgTable(
-  'content_revisions',
-  {
-    id: uuid('id').defaultRandom().primaryKey(),
-    siteId: uuid('site_id')
-      .notNull()
-      .references(() => sites.id, { onDelete: 'cascade' }),
-    contentEntryId: uuid('content_entry_id')
-      .notNull()
-      .references(() => contentEntries.id, { onDelete: 'cascade' }),
-    revisionNumber: integer('revision_number').notNull(),
-    changeSummary: text('change_summary'),
-    data: jsonb('data').notNull().default({}),
-    createdByUserId: uuid('created_by_user_id').references(() => users.id, { onDelete: 'set null' }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => [index('content_revisions_entry_id_idx').on(table.contentEntryId)],
-);
-
-export const taxonomies = pgTable(
-  'taxonomies',
-  {
-    id: uuid('id').defaultRandom().primaryKey(),
-    siteId: uuid('site_id')
-      .notNull()
-      .references(() => sites.id, { onDelete: 'cascade' }),
-    name: varchar('name', { length: 255 }).notNull(),
-    slug: varchar('slug', { length: 255 }).notNull(),
-    description: text('description'),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => [index('taxonomies_site_id_idx').on(table.siteId)],
-);
-
-export const taxonomyTerms = pgTable(
-  'taxonomy_terms',
-  {
-    id: uuid('id').defaultRandom().primaryKey(),
-    siteId: uuid('site_id')
-      .notNull()
-      .references(() => sites.id, { onDelete: 'cascade' }),
-    taxonomyId: uuid('taxonomy_id')
-      .notNull()
-      .references(() => taxonomies.id, { onDelete: 'cascade' }),
-    parentId: uuid('parent_id'),
-    name: varchar('name', { length: 255 }).notNull(),
-    slug: varchar('slug', { length: 255 }).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => [index('taxonomy_terms_site_id_idx').on(table.siteId)],
-);
-
-export const contentEntryTerms = pgTable(
-  'content_entry_terms',
-  {
-    siteId: uuid('site_id')
-      .notNull()
-      .references(() => sites.id, { onDelete: 'cascade' }),
-    contentEntryId: uuid('content_entry_id')
-      .notNull()
-      .references(() => contentEntries.id, { onDelete: 'cascade' }),
-    taxonomyTermId: uuid('taxonomy_term_id')
-      .notNull()
-      .references(() => taxonomyTerms.id, { onDelete: 'cascade' }),
-  },
-);
-
-export const contentRelationships = pgTable(
-  'content_relationships',
-  {
-    id: uuid('id').defaultRandom().primaryKey(),
-    siteId: uuid('site_id')
-      .notNull()
-      .references(() => sites.id, { onDelete: 'cascade' }),
-    sourceEntryId: uuid('source_entry_id')
-      .notNull()
-      .references(() => contentEntries.id, { onDelete: 'cascade' }),
-    targetEntryId: uuid('target_entry_id')
-      .notNull()
-      .references(() => contentEntries.id, { onDelete: 'cascade' }),
-    relationType: varchar('relation_type', { length: 100 }).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => [index('content_relationships_site_id_idx').on(table.siteId)],
-);
-
-export const mediaAssets = pgTable(
-  'media_assets',
-  {
-    id: uuid('id').defaultRandom().primaryKey(),
-    siteId: uuid('site_id')
-      .notNull()
-      .references(() => sites.id, { onDelete: 'cascade' }),
-    uploadedByUserId: uuid('uploaded_by_user_id').references(() => users.id, { onDelete: 'set null' }),
-    originalName: varchar('original_name', { length: 500 }).notNull(),
-    storageKey: varchar('storage_key', { length: 1000 }).notNull().unique(),
-    mimeType: varchar('mime_type', { length: 255 }).notNull(),
-    sizeBytes: integer('size_bytes').notNull(),
-    altText: text('alt_text'),
-    metadata: jsonb('metadata').notNull().default({}),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => [index('media_assets_site_id_idx').on(table.siteId)],
+  (table) => [
+    index('content_entries_site_id_idx').on(table.siteId),
+    index('content_entries_site_type_idx').on(table.siteId, table.contentTypeId),
+    index('content_entries_site_status_idx').on(table.siteId, table.status),
+    uniqueIndex('content_entries_site_id_id_uidx').on(table.siteId, table.id),
+    uniqueIndex('content_entries_site_id_slug_uidx').on(table.siteId, table.slug),
+    foreignKey({
+      columns: [table.siteId, table.contentTypeId],
+      foreignColumns: [contentTypes.siteId, contentTypes.id],
+      name: 'content_entries_site_type_fk',
+    }),
+  ],
 );
