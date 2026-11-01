@@ -770,6 +770,10 @@ Use stable releases available at implementation time. Do not pin the architectur
 
 ## Phase 1 — Platform Foundation
 
+Engineering phases in `AGENTS.md` split this work as Engineering Phase 0
+(engineering foundation, monorepo, Docker, CI) and Engineering Phase 1
+(platform foundation). Product Phase 1 includes both.
+
 Deliver:
 
 - Monorepo architecture.

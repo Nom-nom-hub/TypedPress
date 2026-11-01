@@ -1365,6 +1365,7 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm format:check
 ```
 
 Run Playwright tests for affected critical workflows.
@@ -1611,7 +1612,9 @@ The engineering underneath it must be equally exceptional.
 
 # MANDATORY AGENT EXECUTION DIRECTIVE
 
-Upon reading this file, you are authorized and instructed to begin executing the project specification.
+Reading this file alone does not authorize implementation or remote repository
+writes. Begin Phase 0 only when the user gives an explicit implementation
+assignment. Commit or push changes only with task-level authorization.
 
 **Your immediate assignment is PHASE 0 — Repository and Architecture.**
 

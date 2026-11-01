@@ -36,8 +36,8 @@ jobs:
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://typedpress:typedpress@localhost:5432/typedpress
-      SESSION_SECRET: ci-session-secret
-      CSRF_SECRET: ci-csrf-secret
+      SESSION_SECRET: ci-session-secret-0123456789abcdef0123456789abcdef
+      CSRF_SECRET: ci-csrf-secret-0123456789abcdef0123456789abcdef0
 
     steps:
       - name: Checkout

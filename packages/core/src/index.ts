@@ -30,24 +30,24 @@ export interface ServiceContainer {
 }
 
 function createServiceContainer(): ServiceContainer {
-  const services = new Map<string, unknown>();
+  const services = new Map<object, unknown>();
 
   return {
     register(token, service) {
-      if (services.has(token.key)) {
+      if (services.has(token)) {
         throw new DuplicateServiceError(token.key);
       }
-      services.set(token.key, service);
+      services.set(token, service);
     },
     resolve(token) {
-      const service = services.get(token.key);
+      const service = services.get(token);
       if (service === undefined) {
         throw new ServiceNotFoundError(token.key);
       }
       return service as never;
     },
     has(token) {
-      return services.has(token.key);
+      return services.has(token);
     },
   };
 }
@@ -84,6 +84,7 @@ function createEventBus(logger: Logger): EventBus {
             event,
             error: error instanceof Error ? error.message : String(error),
           });
+          throw error;
         }
       }
     },
@@ -117,14 +118,24 @@ export function createPlatform(options: PlatformOptions = {}): Platform {
         return;
       }
       running = true;
-      await events.emit('platform.started', undefined);
+      try {
+        await events.emit('platform.started', undefined);
+      } catch (error) {
+        running = false;
+        throw error;
+      }
     },
     async stop() {
       if (!running) {
         return;
       }
       running = false;
-      await events.emit('platform.stopped', undefined);
+      try {
+        await events.emit('platform.stopped', undefined);
+      } catch (error) {
+        running = true;
+        throw error;
+      }
     },
   };
 }

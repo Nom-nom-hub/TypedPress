@@ -4,6 +4,10 @@
 
 Accepted.
 
+## Date
+
+2026-11-01
+
 ## Context
 
 The platform is implemented as a TypeScript-first modular monorepo. Product specifications require strict package boundaries, pnpm workspaces, Turborepo orchestration, PostgreSQL with Drizzle ORM, and a CI pipeline.
@@ -18,6 +22,14 @@ The platform is implemented as a TypeScript-first modular monorepo. Product spec
 - Use PostgreSQL through Drizzle ORM and committed migrations.
 - Use Vitest for unit and integration tests.
 - Use GitHub Actions for CI.
+
+## Alternatives considered
+
+- A single-application repository without package boundaries.
+- Separate repositories for each subsystem.
+- Backend frameworks other than the adapter-based Node.js stack.
+- A different ORM or direct SQL approach.
+- Build and test tools other than pnpm, Turborepo, Vitest, and GitHub Actions.
 
 ## Consequences
 

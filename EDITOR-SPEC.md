@@ -92,26 +92,27 @@ The editor must use a structured, versioned JSON document model.
 Example:
 
     {
-      "schemaVersion": 1,
-      "type": "page",
-      "root": {
-        "id": "root-001",
-        "component": "core:container",
-        "props": {
-          "width": "full",
-          "maxWidth": "1200px"
+      "version": 1,
+      "root": "root-001",
+      "nodes": {
+        "root-001": {
+          "id": "root-001",
+          "component": "core:container",
+          "props": {
+            "width": "full",
+            "maxWidth": "1200px"
+          },
+          "children": ["hero-001"]
         },
-        "children": [
-          {
-            "id": "hero-001",
-            "component": "core:hero",
-            "props": {
-              "heading": "Build something exceptional",
-              "description": "A platform for modern websites."
-            },
-            "children": []
-          }
-        ]
+        "hero-001": {
+          "id": "hero-001",
+          "component": "core:hero",
+          "props": {
+            "heading": "Build something exceptional",
+            "description": "A platform for modern websites."
+          },
+          "children": []
+        }
       }
     }
 

@@ -59,8 +59,8 @@ Example:
         "admin": "./dist/admin.js"
       },
       "permissions": [
-        "content:read",
-        "analytics:write"
+        "content.read",
+        "analytics.write"
       ],
       "contributions": {
         "adminPages": true,
@@ -98,13 +98,15 @@ Reject invalid identifiers and incompatible versions.
 Implement explicit lifecycle states:
 
 - DISCOVERED.
-- VALIDATED.
+- VALIDATING.
 - INSTALLED.
 - ENABLED.
 - DISABLED.
-- FAILED.
-- UNINSTALLING.
+- UPDATING.
 - UNINSTALLED.
+- FAILED.
+
+These names are the canonical lifecycle vocabulary shared with `AGENTS.md`.
 
 Lifecycle operations:
 
@@ -130,19 +132,19 @@ Plugins must declare required capabilities.
 
 Initial capability categories:
 
-- `content:read`
-- `content:write`
-- `media:read`
-- `media:write`
-- `users:read`
-- `settings:read`
-- `settings:write`
-- `events:subscribe`
-- `jobs:register`
-- `api:register`
-- `editor:components`
-- `admin:pages`
-- `storage:plugin`
+- `content.read`
+- `content.write`
+- `media.read`
+- `media.write`
+- `users.read`
+- `settings.read`
+- `settings.write`
+- `events.subscribe`
+- `jobs.register`
+- `api.register`
+- `editor.components`
+- `admin.pages`
+- `storage.plugin`
 
 Permissions must be scoped to the appropriate site and resource.
 

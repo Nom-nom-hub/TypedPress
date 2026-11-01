@@ -253,8 +253,12 @@ Required direction:
     Platform services
         ↓
     Core interfaces
-        ↓
+        ↑
     Infrastructure adapters
+
+Infrastructure adapters implement core interfaces and are injected into
+platform services. Core defines contracts and does not depend on adapter
+implementations.
 
 Rules:
 

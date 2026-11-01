@@ -503,7 +503,9 @@ However, self-review is not independent approval.
 
 The agent must never approve its own pull request to satisfy a required review gate.
 
-For a single-developer repository, the repository owner must provide the independent approval when branch protection requires it.
+For a single-developer repository, an independent collaborator with the necessary
+repository permissions must provide the required review when branch protection
+requires it. Integration remains blocked until that review is available.
 
 Do not weaken review requirements just because a reviewer is unavailable.
 

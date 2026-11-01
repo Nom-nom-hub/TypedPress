@@ -128,7 +128,12 @@ Fields:
 - site_id: UUID.
 - role_id: UUID.
 
-Support platform-level roles separately from site-specific roles.
+Model platform-level roles in a separate `platform_user_roles` join table that
+references roles with a null `site_id`.
+
+For site roles, enforce a composite foreign key from `user_site_roles` to
+`roles` on `(site_id, role_id)`, ensuring the assigned role belongs to the same
+site as the assignment.
 
 ## 4. Content Management
 
@@ -207,8 +212,13 @@ Fields:
 
 Fields:
 
+- site_id: UUID.
 - entry_id: UUID.
 - term_id: UUID.
+
+Both entry_id and term_id must reference parent records with the same
+`site_id`; enforce same-site membership with composite foreign keys or an
+equivalent invariant.
 
 ### scheduled_publications
 
@@ -349,8 +359,9 @@ Fields:
 Fields:
 
 - id: UUID.
-- plugin_id: UUID.
+- site_plugins_id: UUID references `site_plugins.id`.
 - capability: text.
+- resource_scope: text.
 - granted_at: nullable timestamp.
 - granted_by: nullable UUID.
 
